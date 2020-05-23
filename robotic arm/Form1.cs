@@ -18,6 +18,7 @@ namespace robotic_arm
         {
             InitializeComponent();
         }
+
         float step = 1;
 
         float eyeX =5;
@@ -29,6 +30,13 @@ namespace robotic_arm
         float upX = 0;
         float upY = 1;
         float upZ = 0;
+
+
+        float rotobject = 0.0f;
+        float[] rotsidefing = { 0.0f, 0.0f };
+        float[] rotfing_1_2 = { 0.0f, 0.0f };
+        float[] rotfing_3_4 = { 0.0f, 0.0f };
+
         private void openGLControl1_OpenGLInitialized(object sender, EventArgs e)
         {
             //  Возьмём OpenGL объект
@@ -68,36 +76,87 @@ namespace robotic_arm
                             upX, upY, upZ);    // Верх камеры
             gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_FILL);
             DrawLine(gl);
-
+            //ладонь
+            //gl.Translate()
+            gl.PushMatrix();
+            gl.Translate(-1.5f, 0.0f, 0.0f);
+            gl.Rotate(rotobject, 0.0f, 0.0f, 1.0f);
+            gl.Translate(1.5f, 0.0f, 0.0f);
             Drawpolygon(gl);
+            
+
+            gl.PushMatrix();
+            gl.Translate(1.5f, -1.0f, 1.25);
+            gl.Rotate(rotfing_1_2[0], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-1.5f, 1.0f, -1.25);
             DrawFinger(gl);//первый палец слева направо
+            //gl.PushMatrix();
+            gl.Translate(3.0f, -1.0f, 1.25);
+            gl.Rotate(rotfing_1_2[1], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-3.0f, 1.0f, -1.25);
             Draw_last_finger(gl);
-            gl.PushMatrix();
-            gl.Translate(0.0f, 0.0f, -1.0f);
-            DrawFinger(gl);
-            Draw_last_finger(gl);
+            //gl.PopMatrix();
             gl.PopMatrix();
 
             gl.PushMatrix();
+            gl.Translate(0.0f, 0.0f, -1.0f);//перенос на начало второго пальца как будто первого
+            gl.Translate(1.5f, -1.0f,1.25);
+            gl.Rotate(rotfing_1_2[0], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-1.5f, 1.0f, -1.25);
+            DrawFinger(gl);
+            //gl.PushMatrix();
+            gl.Translate(3.0f, -1.0f, 1.25);
+            gl.Rotate(rotfing_1_2[1], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-3.0f, 1.0f, -1.25);
+            Draw_last_finger(gl);
+            //gl.PopMatrix();
+            gl.PopMatrix();
+
+
+            //третий палец объединен с четвертым
+            gl.PushMatrix();//третий палец
             gl.Translate(0.0f, 0.0f, -2.0f);
+            gl.Translate(1.5f, -1.0f, -1.25);
+            gl.Rotate(rotfing_3_4[0], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-1.5f, 1.0f, 1.25);
             DrawFinger(gl);
+            //gl.PushMatrix();
+            gl.Translate(3.0f, -1.0f, 1.25);
+            gl.Rotate(rotfing_3_4[1], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-3.0f, 1.0f, -1.25);
             Draw_last_finger(gl);
+            //gl.PopMatrix();
             gl.PopMatrix();
 
-            gl.PushMatrix();
+            gl.PushMatrix();//четвертый палец
             gl.Translate(0.0f, 0.0f, -3.0f);
+            gl.Translate(1.5f, -1.0f, -1.25);
+            gl.Rotate(rotfing_3_4[0], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-1.5f, 1.0f, 1.25);
             DrawFinger(gl);
+            //gl.PushMatrix();
+            gl.Translate(3.0f, -1.0f, 1.25);
+            gl.Rotate(rotfing_3_4[1], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-3.0f, 1.0f, -1.25);
             Draw_last_finger(gl);
+            //gl.PopMatrix();
             gl.PopMatrix();
 
             //крайний палец
             gl.PushMatrix();
             gl.Translate(-1.5f, 0.0f, -1.0f);
             gl.Rotate(90.0f, 0, 1, 0);
+            gl.Translate(1.5f, -1.0f, 0.5);
+            gl.Rotate(rotsidefing[0], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-1.5f, 1.0f, -0.5);
             DrawFinger(gl);
+            gl.Translate(3.0f, -1.0f, 1.25);
+            gl.Rotate(rotsidefing[1], 0.0f, 0.0f, 1.0f);
+            gl.Translate(-3.0f, 1.0f, -1.25);
             Draw_last_finger(gl);
             gl.PopMatrix();
 
+            gl.PopMatrix();
             gl.DrawText(5, 65, 255, 0, 0, "", 12, "eyeX : " + eyeX + ", eyeY : " + eyeY + ", eyeZ : " + eyeZ + "");
             gl.DrawText(5, 45, 255, 0, 0, "", 12, "centerX : " + centerX + ", centerY : " + centerY + ", centerZ : " + centerZ + "");
             gl.DrawText(5, 25, 255, 0, 0, "", 12, "upX : " + upX + ", upY : " + upY + ", upZ : " + upZ + "");
@@ -268,8 +327,149 @@ namespace robotic_arm
                 case Keys.H: centerY -= step; break;
                 case Keys.B: centerZ += step; break;
                 case Keys.N: centerZ -= step; break;
+
+                //rotations
+                case Keys.D1:
+                    rotobject += step;
+                    if (rotobject >= 90)
+                        rotobject = 90;
+                    break;
+                case Keys.D2:
+                    rotobject -= step;
+                    if (rotobject <= -90)
+                        rotobject = -90;
+                    break;
+            
+                //rotation of fingers
+                //finger 1
+                case Keys.D3:
+                    //if (radioButton1.Checked == true)
+                    //{
+                        rotfing_1_2[0] += step;
+                        if (rotfing_1_2[0] >= 0)
+                        {
+                            rotfing_1_2[0] = 0;
+                        }
+                    //}
+                    //finger1
+                    //if (radioButton2.Checked == false)
+                    //{
+                    //    rotfing_1_2[1] += step;
+                    //    if (rotfing_1_2[1] >= 0)
+                    //    {
+                    //        rotfing_1_2[1] = 0;
+                    //    }
+                    //}
+                    break;//finger1
+                case Keys.D4:
+                    //if (radioButton1.Checked == true)
+                    //{
+                        rotfing_1_2[0] -= step;
+                        if (rotfing_1_2[0] <= -90)
+                        {
+                            rotfing_1_2[0] = -90;
+                        }
+                   // }
+                    //if (radioButton2.Checked == true)
+                    //{
+                    //    rotfing_1_2[1] -= step;
+                    //    if (rotfing_1_2[1] <= -90)
+                    //    {
+                    //        rotfing_1_2[1] = -90;
+                    //    }
+                    //}
+                    break;
+                //finger 2
+                case Keys.D5:
+                    rotfing_3_4[0] += step;
+                    if (rotfing_3_4[0] >= 0)
+                    {
+                        rotfing_3_4[0] = 0;
+                    }
+                    break;
+                case Keys.D6:
+                    rotfing_3_4[0] -= step;
+                    if (rotfing_3_4[0] <= -90)
+                    {
+                        rotfing_3_4[0] = -90;
+                    }
+                    break;
+                //sidefinger
+                case Keys.D7:
+                    rotsidefing[0] += step;
+                    if (rotsidefing[0] >= 0)
+                    {
+                        rotsidefing[0] = 0;
+                    }
+                    break;//finger1
+                case Keys.D8:
+                    rotsidefing[0] -= step;
+                    if (rotsidefing[0] <= -100)
+                    {
+                        rotsidefing[0] = -100;
+                    }
+                    break;
+
+
+
+
+                //Rotation of forefingers
+                case Keys.F3:
+                    rotfing_1_2[1] += step;
+                    if (rotfing_1_2[1] >= 0)
+                    {
+                        rotfing_1_2[1] = 0;
+                    }
+                    break;//finger1
+                case Keys.F4:
+                    rotfing_1_2[1] -= step;
+                    if (rotfing_1_2[1] <= -90)
+                    {
+                        rotfing_1_2[1] = -90;
+                    }
+                    break;
+                    //finger 2
+                case Keys.F5:
+                    rotfing_3_4[1] += step;
+                    if (rotfing_3_4[1] >= 0)
+                    {
+                        rotfing_3_4[1] = 0;
+                    }
+                    break;
+                case Keys.F6:
+                    rotfing_3_4[1] -= step;
+                    if (rotfing_3_4[1] <= -90)
+                    {
+                        rotfing_3_4[1] = -90;
+                    }
+                    break;
+                //sidefinger
+                case Keys.F7:
+                    rotsidefing[1] += step;
+                    if (rotsidefing[1] >= 0)
+                    {
+                        rotsidefing[1] = 0;
+                    }
+                    break;//finger1
+                case Keys.F8:
+                    rotsidefing[1] -= step;
+                    if (rotsidefing[1] <= -100)
+                    {
+                        rotsidefing[1] = -100;
+                    }
+                    break;
+                case Keys.Back:
+                    rotobject = 0;
+                    rotfing_1_2[0] = 0;
+                    rotfing_1_2[1] = 0;
+                    rotfing_3_4[0] = 0;
+                    rotfing_3_4[1] = 0;
+                    rotsidefing[0] = 0;
+                    rotsidefing[1] = 0;
+                    break;
             }
         }
+
     }
 
 
