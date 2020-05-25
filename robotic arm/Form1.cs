@@ -20,10 +20,10 @@ namespace robotic_arm
         }
 
         float step = 1;
-
-        float eyeX =5;
+        float Angleofspoka = 0.0f;
+        float eyeX =9;
         float eyeY = 3;
-        float eyeZ = 5;
+        float eyeZ = 0;
         float centerX = 0;
         float centerY = 0;
         float centerZ = 0;
@@ -83,65 +83,89 @@ namespace robotic_arm
             gl.Rotate(rotobject, 0.0f, 0.0f, 1.0f);
             gl.Translate(1.5f, 0.0f, 0.0f);
             Drawpolygon(gl);
-            
 
+
+
+            float[] X1 = { 1.5f, 1.5f, 3.0f, 3.0f };
+            float[] Z1 = { 2.0f, 1.0f, 1.0f, 2.0f };
+
+            float[] x1 = { 3.0f, 3.0f, 4.5f, 4.5f };
+            float[] z1 = { 2.0f, 1.0f, 1.0f, 1.70f };
             gl.PushMatrix();
             gl.Translate(1.5f, -1.0f, 1.25);
             gl.Rotate(rotfing_1_2[0], 0.0f, 0.0f, 1.0f);
             gl.Translate(-1.5f, 1.0f, -1.25);
-            DrawFinger(gl);//первый палец слева направо
+            DrawFinger(gl,X1,Z1);//первый палец слева направо
             //gl.PushMatrix();
             gl.Translate(3.0f, -1.0f, 1.25);
             gl.Rotate(rotfing_1_2[1], 0.0f, 0.0f, 1.0f);
             gl.Translate(-3.0f, 1.0f, -1.25);
-            Draw_last_finger(gl);
+            Draw_last_finger(gl,x1,z1);
             //gl.PopMatrix();
             gl.PopMatrix();
 
+            float[] X2 = { 1.5f, 1.5f, 3.0f, 3.0f };
+            float[] Z2 = { 2.0f, 1.0f, 1.0f+Angleofspoka, 2.0f };
+
+            float[] x2 = { 3.0f, 3.0f, 4.5f, 4.5f };
+            float[] z2 = { 2.0f, 1.0f + Angleofspoka, 1.0f + (Angleofspoka+Angleofspoka), 2.0f };
             gl.PushMatrix();
             gl.Translate(0.0f, 0.0f, -1.0f);//перенос на начало второго пальца как будто первого
             gl.Translate(1.5f, -1.0f,1.25);
             gl.Rotate(rotfing_1_2[0], 0.0f, 0.0f, 1.0f);
             gl.Translate(-1.5f, 1.0f, -1.25);
-            DrawFinger(gl);
+            DrawFinger(gl,X2,Z2);
             //gl.PushMatrix();
             gl.Translate(3.0f, -1.0f, 1.25);
             gl.Rotate(rotfing_1_2[1], 0.0f, 0.0f, 1.0f);
             gl.Translate(-3.0f, 1.0f, -1.25);
-            Draw_last_finger(gl);
+            Draw_last_finger(gl,x2,z2);
             //gl.PopMatrix();
             gl.PopMatrix();
 
+            float[] X3 = { 1.5f, 1.5f, 3.0f, 3.0f };
+            float[] Z3 = { 2.0f, 1.0f, 1.0f, 2.0f-Angleofspoka };
 
+            float[] x3 = { 3.0f, 3.0f, 4.5f, 4.5f };
+            float[] z3 = { 2.0f - Angleofspoka, 1.0f, 1.0f, 2.0f - (Angleofspoka+Angleofspoka) };
             //третий палец объединен с четвертым
             gl.PushMatrix();//третий палец
             gl.Translate(0.0f, 0.0f, -2.0f);
             gl.Translate(1.5f, -1.0f, -1.25);
             gl.Rotate(rotfing_3_4[0], 0.0f, 0.0f, 1.0f);
             gl.Translate(-1.5f, 1.0f, 1.25);
-            DrawFinger(gl);
+            DrawFinger(gl,X3,Z3);
             //gl.PushMatrix();
             gl.Translate(3.0f, -1.0f, 1.25);
             gl.Rotate(rotfing_3_4[1], 0.0f, 0.0f, 1.0f);
             gl.Translate(-3.0f, 1.0f, -1.25);
-            Draw_last_finger(gl);
+            Draw_last_finger(gl,x3,z3);
             //gl.PopMatrix();
             gl.PopMatrix();
 
+            float[] X4 = { 1.5f, 1.5f, 3.0f, 3.0f };
+            float[] Z4 = { 2.0f, 1.0f, 1.0f, 2.0f };
+
+            float[] x4 = { 3.0f, 3.0f, 4.5f, 4.5f };
+            float[] z4 = { 2.0f, 1.0f, 1.30f, 2.00f };
             gl.PushMatrix();//четвертый палец
             gl.Translate(0.0f, 0.0f, -3.0f);
             gl.Translate(1.5f, -1.0f, -1.25);
             gl.Rotate(rotfing_3_4[0], 0.0f, 0.0f, 1.0f);
             gl.Translate(-1.5f, 1.0f, 1.25);
-            DrawFinger(gl);
+            DrawFinger(gl,X4,Z4);
             //gl.PushMatrix();
             gl.Translate(3.0f, -1.0f, 1.25);
             gl.Rotate(rotfing_3_4[1], 0.0f, 0.0f, 1.0f);
             gl.Translate(-3.0f, 1.0f, -1.25);
-            Draw_last_finger(gl);
+            Draw_last_finger(gl,x4,z4);
             //gl.PopMatrix();
             gl.PopMatrix();
 
+            float[] X5 = { 1.5f, 1.5f, 3.0f, 3.0f };
+            float[] Z5 = { 2.0f, 1.0f, 1.0f, 2.0f };
+            float[] x5 = { 3.0f, 3.0f, 4.5f, 4.5f };
+            float[] z5 = { 2.0f, 1.0f, 1.33f, 1.67f };
             //крайний палец
             gl.PushMatrix();
             gl.Translate(-1.5f, 0.0f, -1.0f);
@@ -149,11 +173,11 @@ namespace robotic_arm
             gl.Translate(1.5f, -1.0f, 0.5);
             gl.Rotate(rotsidefing[0], 0.0f, 0.0f, 1.0f);
             gl.Translate(-1.5f, 1.0f, -0.5);
-            DrawFinger(gl);
+            DrawFinger(gl,X5,Z5);
             gl.Translate(3.0f, -1.0f, 1.25);
             gl.Rotate(rotsidefing[1], 0.0f, 0.0f, 1.0f);
             gl.Translate(-3.0f, 1.0f, -1.25);
-            Draw_last_finger(gl);
+            Draw_last_finger(gl,x5,z5);
             gl.PopMatrix();
 
             gl.PopMatrix();
@@ -163,14 +187,17 @@ namespace robotic_arm
             gl.Flush();
         }
         
-        void Draw_last_finger(OpenGL gl)
+        void Draw_last_finger(OpenGL gl,float [] x, float [] z)//конец пальца
         {
-            float[] x = { 3.0f, 3.0f, 4.5f, 4.5f };
-            float[] z = { 2.0f, 1.0f, 1.33f, 1.67f };
             gl.Color(1.0f, 0.5f, 0.5f);
             gl.Begin(OpenGL.GL_POLYGON);//почемуто не ровно
             for (int i = 0; i < 4; ++i)
+            {
+                if(i<2)
                 gl.Vertex(x[i], 0.0f, z[i]);
+                else
+                gl.Vertex(x[i], -0.4f, z[i]);
+            }
             gl.End();
             gl.Color(0.5f, 0.0f, 0.5f);
             gl.Begin(OpenGL.GL_POLYGON);
@@ -179,7 +206,7 @@ namespace robotic_arm
             gl.End();
 
             gl.Begin(OpenGL.GL_QUADS);
-            for (int i1 = 0; i1 < 4; ++i1)
+            for (int i1 = 0; i1 < 4; i1++)
             {
                 //gl.Color(1.0f, 0.5f, 0.0f); 
                 gl.Color(
@@ -191,8 +218,27 @@ namespace robotic_arm
 
                 int i2 = (i1 + 1) % 4;//следующие координаты после i
                                       //нижние точки
-                gl.Vertex(x[i1], 0.0f, z[i1]);
-                gl.Vertex(x[i2], 0.0f, z[i2]);
+                switch (i1)
+                {
+                    case 0:
+                        gl.Vertex(x[i1], 0.0f, z[i1]);
+                        gl.Vertex(x[i2], 0.0f, z[i2]);
+                        break;
+                    case 1:
+                        gl.Vertex(x[i1], 0.0f, z[i1]);
+                        gl.Vertex(x[i2], -0.4f, z[i2]);
+                        break;
+                    case 2:
+                        gl.Vertex(x[i1], -0.4f, z[i1]);
+                        gl.Vertex(x[i2], -0.4f, z[i2]);
+                        break;
+                    case 3:
+                        gl.Vertex(x[i1], -0.4f, z[i1]);
+                        gl.Vertex(x[i2], 0.0f, z[i2]);
+                        break;
+                }  
+
+                
                 //верхние точки
                 gl.Vertex(x[i2], -1.0f, z[i2]);
                 gl.Vertex(x[i1], -1.0f, z[i1]);
@@ -200,10 +246,9 @@ namespace robotic_arm
             gl.End();
 
         }
-        void DrawFinger(OpenGL gl)
+        void DrawFinger(OpenGL gl, float [] x, float []z)//палец
         {
-            float[] x = { 1.5f,1.5f,3.0f,3.0f };
-            float[] z = { 2.0f,1.0f,1.0f,2.0f };
+            
             gl.Color(1.0f, 0.0f, 1.0f);
             gl.Begin(OpenGL.GL_POLYGON);//почемуто не ровно
             for (int i = 0; i < 4; ++i)
@@ -236,7 +281,7 @@ namespace robotic_arm
             }
             gl.End();
         }
-        private void Drawpolygon(OpenGL gl)
+        private void Drawpolygon(OpenGL gl)//ладонь
         {
             float[] x = { -1.5f, -1.5f, -0.5f, -0.5f, 0.5f, 0.5f, 1.5f, 1.5f };
             float[] z = { 2.0f, -2.0f, -2.0f, -2.5f, -2.5f, -2.0f, -2.0f, 2.0f };
@@ -273,16 +318,16 @@ namespace robotic_arm
             }
             gl.End();
         }
-        private void DrawPoint(OpenGL gl)
-        {
-            gl.PushMatrix();
-            gl.PointSize(10.0f);
-            gl.Begin(OpenGL.GL_POINTS);
-            gl.Color(0.0, 0.0, 0.0);//X axis is red
-            gl.Vertex(0.0, 0.0, 0.0);
-            gl.End();
-            gl.PopMatrix();
-        }
+        //private void DrawPoint(OpenGL gl)
+        //{
+        //    gl.PushMatrix();
+        //    gl.PointSize(10.0f);
+        //    gl.Begin(OpenGL.GL_POINTS);
+        //    gl.Color(0.0, 0.0, 0.0);//X axis is red
+        //    gl.Vertex(0.0, 0.0, 0.0);
+        //    gl.End();
+        //    gl.PopMatrix();
+        //}
         private void DrawLine(OpenGL gl)
         {
             gl.PushMatrix();
@@ -343,23 +388,11 @@ namespace robotic_arm
                 //rotation of fingers
                 //finger 1
                 case Keys.D3:
-                    //if (radioButton1.Checked == true)
-                    //{
                         rotfing_1_2[0] += step;
                         if (rotfing_1_2[0] >= 0)
                         {
                             rotfing_1_2[0] = 0;
                         }
-                    //}
-                    //finger1
-                    //if (radioButton2.Checked == false)
-                    //{
-                    //    rotfing_1_2[1] += step;
-                    //    if (rotfing_1_2[1] >= 0)
-                    //    {
-                    //        rotfing_1_2[1] = 0;
-                    //    }
-                    //}
                     break;//finger1
                 case Keys.D4:
                     //if (radioButton1.Checked == true)
@@ -369,15 +402,6 @@ namespace robotic_arm
                         {
                             rotfing_1_2[0] = -90;
                         }
-                   // }
-                    //if (radioButton2.Checked == true)
-                    //{
-                    //    rotfing_1_2[1] -= step;
-                    //    if (rotfing_1_2[1] <= -90)
-                    //    {
-                    //        rotfing_1_2[1] = -90;
-                    //    }
-                    //}
                     break;
                 //finger 2
                 case Keys.D5:
@@ -467,9 +491,18 @@ namespace robotic_arm
                     rotsidefing[0] = 0;
                     rotsidefing[1] = 0;
                     break;
+                case Keys.U:
+                    Angleofspoka += 0.1f;
+                    if(Angleofspoka>0.4f)
+                        Angleofspoka = 0.4f;
+                    break;
+                case Keys.I:
+                    Angleofspoka -= 0.1f;
+                    if (Angleofspoka < 0)
+                        Angleofspoka = 0;
+                    break;
             }
         }
-
     }
 
 
