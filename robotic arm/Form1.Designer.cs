@@ -34,14 +34,15 @@
             // 
             // openGLControl1
             // 
+            this.openGLControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.openGLControl1.DrawFPS = false;
-            this.openGLControl1.FrameRate = 30;
-            this.openGLControl1.Location = new System.Drawing.Point(0, 2);
+            this.openGLControl1.FrameRate = 10;
+            this.openGLControl1.Location = new System.Drawing.Point(0, 0);
             this.openGLControl1.Name = "openGLControl1";
             this.openGLControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
             this.openGLControl1.RenderContextType = SharpGL.RenderContextType.DIBSection;
             this.openGLControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
-            this.openGLControl1.Size = new System.Drawing.Size(934, 487);
+            this.openGLControl1.Size = new System.Drawing.Size(1061, 501);
             this.openGLControl1.TabIndex = 0;
             this.openGLControl1.OpenGLInitialized += new System.EventHandler(this.openGLControl1_OpenGLInitialized);
             this.openGLControl1.OpenGLDraw += new SharpGL.RenderEventHandler(this.openGLControl1_OpenGLDraw);

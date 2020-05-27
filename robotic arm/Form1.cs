@@ -8,22 +8,37 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpGL;
-
+using SharpGL.SceneGraph;
+using SharpGL.SceneGraph.Assets;
+using SharpGL.Enumerations;
 
 namespace robotic_arm
 {
     public partial class Form1 : Form
     {
+        int formHeight;
+        int formWidth;
         public Form1()
         {
+            
             InitializeComponent();
+            formHeight = this.Height;
+            formWidth = this.Width;
+
+            
         }
+        bool taken = false;//объект захвачен или нет?
+
+        Texture texture = new Texture();
+        float sphere_x = 0;
+        float sphere_y = 0.0f;
+        float sphere_z = 0.0f;
 
         float step = 1;
         float Angleofspoka = 0.0f;
         float eyeX =9;
         float eyeY = 3;
-        float eyeZ = 0;
+        float eyeZ = 9;
         float centerX = 0;
         float centerY = 0;
         float centerZ = 0;
@@ -31,8 +46,12 @@ namespace robotic_arm
         float upY = 1;
         float upZ = 0;
 
+        float posarm_x = 0.0f;
+        float posarm_y = 0.0f;
+        float posarm_z = 0.0f;
 
-        float rotobject = 0.0f;
+
+        float rotobjectZ = 0.0f;
         float[] rotsidefing = { 0.0f, 0.0f };
         float[] rotfing_1_2 = { 0.0f, 0.0f };
         float[] rotfing_3_4 = { 0.0f, 0.0f };
@@ -42,7 +61,8 @@ namespace robotic_arm
             //  Возьмём OpenGL объект
             OpenGL gl = openGLControl1.OpenGL;
             //  Устанавливаем цвет заливки по умолчанию (в данном случае цвет голубой)
-            gl.ClearColor(1f, 1f, 1f, 1f);
+            gl.ClearColor(1f, 1f, 1f,1f);
+
         }
 
         private void openGLControl1_Resized(object sender, EventArgs e)
@@ -63,29 +83,64 @@ namespace robotic_arm
             //  Зададим модель отображения
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
         }
-
+        
         private void openGLControl1_OpenGLDraw(object sender, RenderEventArgs args)
         {
             OpenGL gl = openGLControl1.OpenGL;
-            //first quad
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+            gl.Enable(OpenGL.GL_DEPTH_TEST);
+            float[] gloabalambient = { 0.5f, 0.5f, 0.5f, 1.0f };
+            float[] ambient = { 0.2f, 0.2f, 0.2f, 1.0f };
+            float[] diffuse = { 0.3f,0.3f,0.3f, 1.0f };
+            float[] lpos = { Width/2, Height/2, 10.0f, 1.0f };
+            float[] specular = { 0.8f, 0.8f, 0.8f, 1.0f };
+
+            float[] lmodelambient = { 0.2f, 0.2f, 0.2f, 1.0f };
+            //first quad
+            
             //  Единичная матрица для последующих преобразований
             gl.LoadIdentity();
+            
+            gl.LightModel(OpenGL.GL_LIGHT_MODEL_AMBIENT, lmodelambient);
+            gl.LightModel(OpenGL.GL_LIGHT_MODEL_AMBIENT, gloabalambient);
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_AMBIENT, ambient);
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_DIFFUSE, diffuse);
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_POSITION, lpos);
+            gl.Light(OpenGL.GL_LIGHT0, OpenGL.GL_SPECULAR, specular);
+            gl.Enable(OpenGL.GL_LIGHTING);
+            gl.Enable(OpenGL.GL_LIGHT0);
+            gl.Enable(OpenGL.GL_COLOR_MATERIAL);
+            gl.ColorMaterial(OpenGL.GL_FRONT, OpenGL.GL_AMBIENT_AND_DIFFUSE);
+
             gl.LookAt(eyeX, eyeY, eyeZ,    // Позиция самой камеры (x, y, z)
                         centerX, centerY, centerZ,     // Направление, куда мы смотрим
                             upX, upY, upZ);    // Верх камеры
-            gl.PolygonMode(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_FILL);
-            DrawLine(gl);
+            
+            DrawWalls(gl, 20.0f, 20.0f, 20.0f);
+
+            
+            gl.ShadeModel(OpenGL.GL_SMOOTH);
+            //DrawLine(gl);
             //ладонь
-            //gl.Translate()
+            
+
             gl.PushMatrix();
+            sphere_x = -15.0f;
+            sphere_y = -3.0f;
+            sphere_z = -5.0f;
+            gl.Translate(sphere_x, sphere_y,sphere_z);
+            Drawsphere(gl);
+            gl.PopMatrix();
+            
+            
+            gl.Translate(posarm_x, posarm_y,posarm_z);
+
             gl.Translate(-1.5f, 0.0f, 0.0f);
-            gl.Rotate(rotobject, 0.0f, 0.0f, 1.0f);
+            gl.Rotate(rotobjectZ, 0.0f, 0.0f, 1.0f);
             gl.Translate(1.5f, 0.0f, 0.0f);
             Drawpolygon(gl);
 
-
-
+            
             float[] X1 = { 1.5f, 1.5f, 3.0f, 3.0f };
             float[] Z1 = { 2.0f, 1.0f, 1.0f, 2.0f };
 
@@ -180,13 +235,112 @@ namespace robotic_arm
             Draw_last_finger(gl,x5,z5);
             gl.PopMatrix();
 
-            gl.PopMatrix();
+           
             gl.DrawText(5, 65, 255, 0, 0, "", 12, "eyeX : " + eyeX + ", eyeY : " + eyeY + ", eyeZ : " + eyeZ + "");
             gl.DrawText(5, 45, 255, 0, 0, "", 12, "centerX : " + centerX + ", centerY : " + centerY + ", centerZ : " + centerZ + "");
             gl.DrawText(5, 25, 255, 0, 0, "", 12, "upX : " + upX + ", upY : " + upY + ", upZ : " + upZ + "");
             gl.Flush();
+            //if (posarm_y < sphere_y)//Y надо двигать до уровня сферы +3
+            //{
+            //    posarm_y += 0.2f;
+            //    if (posarm_y > (sphere_y +3))
+            //        posarm_y = sphere_y + 3;
+            //}
+            //if (posarm_y > sphere_y)
+            //{
+            //    posarm_y -= 0.2f;
+            //    if (posarm_y < (sphere_y + 3))
+            //        posarm_y = sphere_y + 3;
+            //}
+
+            //if (posarm_x<sphere_x)//X надо двигать до уровня сферы
+            //{
+            //    posarm_x += 0.2f;
+            //    if (posarm_x == sphere_x)
+            //        posarm_x = sphere_x;
+            //}
+            //if (posarm_x > sphere_x)
+            //{
+            //    posarm_x -= 0.2f;
+            //    if (posarm_x == sphere_x)
+            //        posarm_x = sphere_x;
+            //}
+
+          
+
+            //if (posarm_z < sphere_z)//Z надо двигать до уровня сферы 
+            //{
+            //    posarm_z += 0.2f;
+            //    if (posarm_z == sphere_z)
+            //        posarm_z = sphere_z;
+            //}
+            //if (posarm_z > sphere_z)
+            //{
+            //    posarm_z -= 0.2f;
+            //    if (posarm_z == sphere_z)
+            //        posarm_z = sphere_z;
+            //}
+
         }
-        
+        void DrawWalls(OpenGL gl, float x, float y, float z)
+        {
+           //gl.Color(0.3f, 0.0f, 1.0f);
+            gl.PushMatrix();
+            //glRotatef(0,0,0,1);
+            gl.Scale(x, y, z);
+            gl.Begin(OpenGL.GL_QUADS);
+            /* Floor */
+
+            //Floor 
+            gl.Color(0.0f, 0.0f, 1.0f);
+            gl.Vertex(-1, -1, -1);
+            gl.Vertex(1, -1, -1);
+            gl.Vertex(1, -1, 1);
+            gl.Vertex(-1, -1, 1);
+
+            // Ceiling /
+            gl.Color(0.7f, 0.0f, 1.0f);
+            gl.Vertex(-1, 1, -1);
+            gl.Vertex(1, 1, -1);
+            gl.Vertex(1, 1, 1);
+            gl.Vertex(-1, 1, 1);
+            //// Walls
+             gl.Color(0.0f, 1.0f, 1.0f);
+            gl.Vertex(-1, -1, 1);
+            gl.Vertex(1, -1, 1);
+            gl.Vertex(1, 1, 1);
+            gl.Vertex(-1, 1, 1);
+
+            gl.Vertex(-1, -1, -1);
+            gl.Vertex(1, -1, -1);
+            gl.Vertex(1, 1, -1);
+            gl.Vertex(-1, 1, -1);
+
+            gl.Vertex(1, 1, 1);
+            gl.Vertex(1, -1, 1);
+            gl.Vertex(1, -1, -1);
+            gl.Vertex(1, 1, -1);
+
+            gl.Vertex(-1, 1, 1);
+            gl.Vertex(-1, -1, 1);
+            gl.Vertex(-1, -1, -1);
+            gl.Vertex(-1, 1, -1);
+            gl.End();
+
+            gl.PopMatrix();
+
+        }
+        void Drawsphere(OpenGL gl)
+        {
+            gl.Color(1.0f, 0.0f, 0.0f);
+            //create sphere quadric
+
+            IntPtr quadric = gl.NewQuadric();
+            gl.QuadricNormals(quadric, OpenGL.GLU_SMOOTH);
+            
+            gl.Sphere(quadric,1.5, 50, 50);//radis = 1.5
+            gl.DeleteQuadric(quadric);
+        }
         void Draw_last_finger(OpenGL gl,float [] x, float [] z)//конец пальца
         {
             gl.Color(1.0f, 0.5f, 0.5f);
@@ -199,7 +353,7 @@ namespace robotic_arm
                 gl.Vertex(x[i], -0.4f, z[i]);
             }
             gl.End();
-            gl.Color(0.5f, 0.0f, 0.5f);
+            //gl.Color(0.5f, 0.0f, 0.5f);
             gl.Begin(OpenGL.GL_POLYGON);
             for (int i = 0; i < 4; ++i)
                 gl.Vertex(x[i], -1.0f, z[i]);
@@ -209,12 +363,12 @@ namespace robotic_arm
             for (int i1 = 0; i1 < 4; i1++)
             {
                 //gl.Color(1.0f, 0.5f, 0.0f); 
-                gl.Color(
-                  i1 < 2 || i1 > 4 ? 0.0f : 1.0f,
-                  i1 > 0 && i1 < 5 ? 0.0f : 1.0f,
-                  i1 > 2 ? 1.0f : 0.0f,
-                  1.0f
-                );
+                //gl.Color(
+                //  i1 < 2 || i1 > 4 ? 0.0f : 1.0f,
+                //  i1 > 0 && i1 < 5 ? 0.0f : 1.0f,
+                //  i1 > 2 ? 1.0f : 0.0f,
+                //  1.0f
+                //);
 
                 int i2 = (i1 + 1) % 4;//следующие координаты после i
                                       //нижние точки
@@ -254,7 +408,7 @@ namespace robotic_arm
             for (int i = 0; i < 4; ++i)
                 gl.Vertex(x[i], 0.0f, z[i]);
             gl.End();
-            gl.Color(1.0f, 0.0f, 0.5f);
+            //gl.Color(1.0f, 0.0f, 0.5f);
             gl.Begin(OpenGL.GL_POLYGON);
             for (int i = 0; i < 4; ++i)
                 gl.Vertex(x[i], -1.0f, z[i]);
@@ -264,12 +418,12 @@ namespace robotic_arm
             for (int i1 = 0; i1 < 4; ++i1)
             {
                 //gl.Color(1.0f, 0.5f, 0.0f); 
-                gl.Color(
-                  i1 < 2 || i1 > 4 ? 1.0f : 0.0f,
-                  i1 > 0 && i1 < 5 ? 1.0f : 0.0f,
-                  i1 > 2 ? 1.0f : 0.0f,
-                  1.0f
-                );
+                //gl.Color(
+                //  i1 < 2 || i1 > 4 ? 1.0f : 0.0f,
+                //  i1 > 0 && i1 < 5 ? 1.0f : 0.0f,
+                //  i1 > 2 ? 1.0f : 0.0f,
+                //  1.0f
+                //);
 
                 int i2 = (i1 + 1) % 4;//следующие координаты после i
                                       //нижние точки
@@ -281,32 +435,40 @@ namespace robotic_arm
             }
             gl.End();
         }
+        
         private void Drawpolygon(OpenGL gl)//ладонь
         {
+            
             float[] x = { -1.5f, -1.5f, -0.5f, -0.5f, 0.5f, 0.5f, 1.5f, 1.5f };
             float[] z = { 2.0f, -2.0f, -2.0f, -2.5f, -2.5f, -2.0f, -2.0f, 2.0f };
+            
+            
             //front part
             gl.Color(1.0f, 0.0f, 1.0f);
             gl.Begin(OpenGL.GL_POLYGON);//почемуто не ровно
             for (int i = 0; i < 8; ++i)
+            {
+                //gl.TexCoord(x[i]/10,z[i]/10);
                 gl.Vertex(x[i], 0.0f, z[i]);
+            }
             gl.End();
-            gl.Color(1.0f, 0.0f, 0.5f);
+           // gl.Color(1.0f, 0.0f, 0.5f);
             gl.Begin(OpenGL.GL_POLYGON);
             for (int i = 0; i < 8; ++i)
                 gl.Vertex(x[i], -1.0f, z[i]);
             gl.End();
 
+
             gl.Begin(OpenGL.GL_QUADS);
             for (int i1 = 0; i1 < 8; ++i1)
             {
                 //gl.Color(1.0f, 0.5f, 0.0f); 
-                gl.Color(
-                  i1 < 2 || i1 > 4 ? 0.5f : 0.0f,
-                  i1 > 0 && i1 < 5 ? 1.0f : 0.0f,
-                  i1 > 2 ? 1.0f : 0.0f,
-                  1.0f
-                );
+                //gl.Color(
+                //  i1 < 2 || i1 > 4 ? 0.5f : 0.0f,
+                //  i1 > 0 && i1 < 5 ? 1.0f : 0.0f,
+                //  i1 > 2 ? 1.0f : 0.0f,
+                //  1.0f
+                //);
 
                 int i2 = (i1 + 1) % 8;//следующие координаты после i
                                       //нижние точки
@@ -316,6 +478,7 @@ namespace robotic_arm
                 gl.Vertex(x[i2], -1.0f, z[i2]);
                 gl.Vertex(x[i1], -1.0f, z[i1]);
             }
+            gl.Disable(OpenGL.GL_TEXTURE_2D);
             gl.End();
         }
         //private void DrawPoint(OpenGL gl)
@@ -375,14 +538,14 @@ namespace robotic_arm
 
                 //rotations
                 case Keys.D1:
-                    rotobject += step;
-                    if (rotobject >= 90)
-                        rotobject = 90;
+                    rotobjectZ += step;
+                    if (rotobjectZ >= 90)
+                        rotobjectZ = 90;
                     break;
                 case Keys.D2:
-                    rotobject -= step;
-                    if (rotobject <= -90)
-                        rotobject = -90;
+                    rotobjectZ -= step;
+                    if (rotobjectZ <= -90)
+                        rotobjectZ = -90;
                     break;
             
                 //rotation of fingers
@@ -447,9 +610,9 @@ namespace robotic_arm
                     break;//finger1
                 case Keys.F4:
                     rotfing_1_2[1] -= step;
-                    if (rotfing_1_2[1] <= -90)
+                    if (rotfing_1_2[1] <= -5)
                     {
-                        rotfing_1_2[1] = -90;
+                        rotfing_1_2[1] = -5;
                     }
                     break;
                     //finger 2
@@ -462,9 +625,9 @@ namespace robotic_arm
                     break;
                 case Keys.F6:
                     rotfing_3_4[1] -= step;
-                    if (rotfing_3_4[1] <= -90)
+                    if (rotfing_3_4[1] <= -5)
                     {
-                        rotfing_3_4[1] = -90;
+                        rotfing_3_4[1] = -5;
                     }
                     break;
                 //sidefinger
@@ -477,13 +640,13 @@ namespace robotic_arm
                     break;//finger1
                 case Keys.F8:
                     rotsidefing[1] -= step;
-                    if (rotsidefing[1] <= -100)
+                    if (rotsidefing[1] <= -30)
                     {
-                        rotsidefing[1] = -100;
+                        rotsidefing[1] = -30;
                     }
                     break;
                 case Keys.Back:
-                    rotobject = 0;
+                    rotobjectZ = 0;
                     rotfing_1_2[0] = 0;
                     rotfing_1_2[1] = 0;
                     rotfing_3_4[0] = 0;
