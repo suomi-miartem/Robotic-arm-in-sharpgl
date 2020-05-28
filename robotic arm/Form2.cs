@@ -131,9 +131,9 @@ namespace robotic_arm
             
             if (move == false)//если кнопка переноса объекта не нажата
             {
-                sphere_x = -15.0f;
-                sphere_y = -3.0f;
-                sphere_z = -5.0f;
+                sphere_x = x;
+                sphere_y = y;
+                sphere_z = z;
                 gl.Translate(sphere_x, sphere_y, sphere_z);
                 Drawsphere(gl);
             }
@@ -391,7 +391,7 @@ namespace robotic_arm
             IntPtr quadric = gl.NewQuadric();
             gl.QuadricNormals(quadric, OpenGL.GLU_SMOOTH);
             
-            gl.Sphere(quadric,1.5, 50, 50);//radis = 1.5
+            gl.Sphere(quadric,(double)radius, 50, 50);//radis = 1.5
             gl.DeleteQuadric(quadric);
         }
         void Draw_last_finger(OpenGL gl,float [] x, float [] z)//конец пальца
