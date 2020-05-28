@@ -115,7 +115,7 @@ namespace robotic_arm
             gl.Enable(OpenGL.GL_LIGHT0);
             gl.Enable(OpenGL.GL_COLOR_MATERIAL);
             gl.ColorMaterial(OpenGL.GL_FRONT_AND_BACK, OpenGL.GL_AMBIENT_AND_DIFFUSE);
-
+            gl.ShadeModel(OpenGL.GL_SMOOTH);
 
             gl.LookAt(eyeX, eyeY, eyeZ,    // Позиция самой камеры (x, y, z)
                         centerX, centerY, centerZ,     // Направление, куда мы смотрим
@@ -126,7 +126,7 @@ namespace robotic_arm
             DrawWalls(gl, 20.0f, 20.0f, 20.0f);//стены
 
 
-            gl.ShadeModel(OpenGL.GL_SMOOTH);
+           
             //DrawLine(gl);
             //ладонь
 

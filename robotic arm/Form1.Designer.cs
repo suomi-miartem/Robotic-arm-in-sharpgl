@@ -42,12 +42,12 @@
             // 
             this.openGLControl1.DrawFPS = false;
             this.openGLControl1.FrameRate = 10;
-            this.openGLControl1.Location = new System.Drawing.Point(0, 0);
+            this.openGLControl1.Location = new System.Drawing.Point(3, 3);
             this.openGLControl1.Name = "openGLControl1";
             this.openGLControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
             this.openGLControl1.RenderContextType = SharpGL.RenderContextType.DIBSection;
             this.openGLControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
-            this.openGLControl1.Size = new System.Drawing.Size(1059, 513);
+            this.openGLControl1.Size = new System.Drawing.Size(1056, 547);
             this.openGLControl1.TabIndex = 0;
             this.openGLControl1.OpenGLInitialized += new System.EventHandler(this.openGLControl1_OpenGLInitialized);
             this.openGLControl1.OpenGLDraw += new SharpGL.RenderEventHandler(this.openGLControl1_OpenGLDraw);
@@ -108,7 +108,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1170, 513);
+            this.ClientSize = new System.Drawing.Size(1370, 562);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
