@@ -158,7 +158,7 @@ namespace robotic_arm
                     double xMax = max * Math.Sin((hAngle / 2) * (Math.PI / 180));
                     double yMax = max * Math.Sin((vAngle / 2) * (Math.PI / 180));
 
-                    Form2 form = new Form2((float)cX, (float)cY, (float)cZ, (float)radius, (float)xMax, (float)yMax, (float)max);
+                    //Form2 form = new Form2((float)cX, (float)cY, (float)cZ, (float)radius, (float)xMax, (float)yMax, (float)max);
                     //form.Show();
                     infoLBL.Text = $"X = {(int)cX};\r\n" +
                         $"Y= {(int)cY};\r\n" +
@@ -185,16 +185,16 @@ namespace robotic_arm
 
             int i = 0;
 
-            while(!topFound || !bottomFound)
+            while(!topFound || !bottomFound) 
             {
-                if(depthMap.At<byte>(rect.Left + rect.Width/2,rect.Top+i) > 0 && !topFound)
+                if(depthMap.At<byte>(rect.Top + i, rect.Left + rect.Width / 2) > 0 && !topFound)
                 {
                     top = new Point(rect.Left + rect.Width / 2, rect.Top + i);
 
-                    topFound = true;
+                    topFound = true; 
                 }
 
-                if (depthMap.At<byte>(rect.Left + rect.Width / 2, rect.Bottom - i) > 0 && !bottomFound)
+                if (depthMap.At<byte>(rect.Bottom - i, rect.Left + rect.Width / 2) > 0 && !bottomFound)
                 {
                     bottom = new Point(rect.Left + rect.Width / 2, rect.Bottom - i);
 
