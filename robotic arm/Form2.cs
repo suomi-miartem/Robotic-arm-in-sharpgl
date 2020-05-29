@@ -9,9 +9,9 @@ namespace robotic_arm
     {
         int formHeight;
         int formWidth;
-        float x, y, z, radius;
+        float x, y, z, radius, xMax, yMax, zMax;
 
-        public Form2(float x, float y, float z, float radius)
+        public Form2(float x, float y, float z, float radius, float xMax, float yMax, float zMax)
         {
             
             InitializeComponent();

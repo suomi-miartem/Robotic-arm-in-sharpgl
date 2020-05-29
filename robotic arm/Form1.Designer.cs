@@ -144,7 +144,6 @@
             // 
             // dividerCB
             // 
-            this.dividerCB.Enabled = false;
             this.dividerCB.FormattingEnabled = true;
             this.dividerCB.Items.AddRange(new object[] {
             "1",

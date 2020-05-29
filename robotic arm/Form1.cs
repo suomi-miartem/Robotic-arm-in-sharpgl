@@ -74,7 +74,6 @@ namespace robotic_arm
         private void numThresholdMin_ValueChanged(object sender, EventArgs e)
         {
             numOfContCB.Enabled = false;
-            findContoursBN.Enabled = true;
             threshold = depthMap.Clone().InRange(new Scalar((double)numThresholdMin.Value), new Scalar((double)numThresholdMax.Value)).Clone().Erode(new Mat()).Dilate(new Mat());
             Mat output = Mat.Zeros(threshold.Size(), threshold.Type());
             Cv2.BitwiseAnd(depthMap, threshold, output);
@@ -86,7 +85,6 @@ namespace robotic_arm
         private void numThresholdMax_ValueChanged(object sender, EventArgs e)
         {
             numOfContCB.Enabled = false;
-            findContoursBN.Enabled = true;
             threshold = depthMap.Clone().InRange(new Scalar((double)numThresholdMin.Value), new Scalar((double)numThresholdMax.Value)).Clone().Erode(new Mat()).Dilate(new Mat());
             Mat output = Mat.Zeros(threshold.Size(), threshold.Type());
             Cv2.BitwiseAnd(depthMap, threshold, output);
@@ -97,6 +95,8 @@ namespace robotic_arm
         //Поиск контуров
         private void findContoursBN_Click(object sender, EventArgs e)
         {
+            if (filePathCB.SelectedIndex < 0) return;
+
             numOfContCB.Enabled = true;
             comChosenContBN.Enabled = true;
             numOfContCB.Items.Clear();
@@ -139,9 +139,11 @@ namespace robotic_arm
 
                     Rect rect = Cv2.BoundingRect(contours[numOfContCB.SelectedIndex].ToArray());//Определение рамки маски
 
+                    Point[] shape = FindShape(rect);
+
                     //Расчет размеров и координат в пространстве
-                    double[] vector1 = FindCoords(rect.X + rect.Width / 2, rect.Top, new double[2] { min, max });
-                    double[] vector2 = FindCoords(rect.X + rect.Width / 2, rect.Bottom, new double[2] { min, max });
+                    double[] vector1 = FindCoords(shape[0].X, shape[0].Y, new double[2] { min, max }); //Векторы крайних точек
+                    double[] vector2 = FindCoords(shape[1].X, shape[1].Y, new double[2] { min, max });
 
                     double lX2 = (vector1[0] - vector2[0]) * (vector1[0] - vector2[0]);
                     double lY2 = (vector1[1] - vector2[1]) * (vector1[1] - vector2[1]);
@@ -153,12 +155,19 @@ namespace robotic_arm
                     double cY = vector2[1] + (vector1[1] - vector2[1]) / 2;
                     double cZ = vector2[2] + (vector1[2] - vector2[2]) / 2;
 
-                    Form2 form = new Form2((float)cX, (float)cY, (float)cZ, (float)radius);
-                    form.Show();
+                    double xMax = max * Math.Sin((hAngle / 2) * (Math.PI / 180));
+                    double yMax = max * Math.Sin((vAngle / 2) * (Math.PI / 180));
+
+                    Form2 form = new Form2((float)cX, (float)cY, (float)cZ, (float)radius, (float)xMax, (float)yMax, (float)max);
+                    //form.Show();
+                    infoLBL.Text = $"X = {(int)cX};\r\n" +
+                        $"Y= {(int)cY};\r\n" +
+                        $"Z={(int)cZ};\r\n" +
+                        $"Radius = {(int)radius}";
                 }
                 else
                 {
-                    throw new Exception("Не все настройки пределены");
+                    throw new Exception("Не все настройки определены");
                 }
             }
              catch(Exception ex)
@@ -167,47 +176,65 @@ namespace robotic_arm
             }
         }
 
+        //Поиск крайних точек объекта сверху и снизу
+        Point[] FindShape(Rect rect)
+        {
+            bool topFound = false, bottomFound = false;
+
+            Point top = new Point(), bottom = new Point();
+
+            int i = 0;
+
+            while(!topFound || !bottomFound)
+            {
+                if(depthMap.At<byte>(rect.Left + rect.Width/2,rect.Top+i) > 0 && !topFound)
+                {
+                    top = new Point(rect.Left + rect.Width / 2, rect.Top + i);
+
+                    topFound = true;
+                }
+
+                if (depthMap.At<byte>(rect.Left + rect.Width / 2, rect.Bottom - i) > 0 && !bottomFound)
+                {
+                    bottom = new Point(rect.Left + rect.Width / 2, rect.Bottom - i);
+
+                    bottomFound = true;
+                }
+
+                i++;
+            }
+
+            return new Point[2] { top, bottom };
+        }
+
         //Возвращает координату точки в 3D пространстве с учетом параметров делителя и углов обзора камеры
         private double[] FindCoords(int x, int y, double[] range)
         {
+            double intensity = (byte)(255 - depthMap.At<byte>(y, x));
+
             //Длина вектора = (шаг*разность+минимум)
-            double vector = ((range[1] - range[0]) / 255) * (255 - depthMap.At<double>(y, x)) + range[0];
+            double vector = ((range[1] - range[0]) / 255) * intensity + range[0];
+
+            double halfAngle = hAngle / 2, convertPix = x - depthMap.Width / 2, halfSize = depthMap.Width / 2;
 
             //Угол горизонтального отклонения от оси Z(в градусах)
-            double horizontal = (hAngle / 2) * ((x - depthMap.Width / 2) / (depthMap.Width / 2));
+            double horizontal = Math.Abs(halfAngle * (convertPix / halfSize));
+
+            halfAngle = vAngle / 2; convertPix = y - depthMap.Height / 2; halfSize = depthMap.Height / 2;
 
             //Угол вертикального отклонения от оси Z(в градусах)
-            double vertical = (vAngle / 2) * (y - depthMap.Height / 2) / (depthMap.Height / 2);
+            double vertical = Math.Abs(halfAngle * (convertPix / halfSize));
 
             //квадраты горизонтальных/вертикальных тангенсов
-            double tg2A = Math.Tan(horizontal) * Math.Tan(horizontal);
-            double tg2B = Math.Tan(vertical) * Math.Tan(vertical);
+            double tg2A = Math.Tan(horizontal*(Math.PI/180)) * Math.Tan(horizontal * (Math.PI / 180));
+            double tg2B = Math.Tan(vertical * (Math.PI / 180)) * Math.Tan(vertical * (Math.PI / 180));
 
+            //Расчет проекций вектора на базисы с учетом знака
             double Z = Math.Sqrt((vector * vector) / (tg2A + tg2B + 1));
-            double X = Z * Math.Tan(horizontal);
-            double Y = Z * Math.Tan(vertical);
+            double X = Z * Math.Tan(horizontal * (Math.PI / 180)) * (x - depthMap.Width / 2) / Math.Abs(x - depthMap.Width / 2);
+            double Y = Z * Math.Tan(vertical * (Math.PI / 180)) * (y - depthMap.Height / 2) / Math.Abs(y - depthMap.Height / 2);
 
             return new double[3] { X, Y, Z };
-        }
-
-        //Возвращает область с минимальным по площади контуром
-        int MinBoundingRectIndex(Point[][] contours)
-        {
-            double area = Cv2.ContourArea(contours[0].ToArray());
-
-            int index = new int();
-
-            for(int i = 0; i < contours.GetLength(0); i++)
-            {
-                if (Cv2.ContourArea(contours[i].ToArray()) < area)
-                {
-                    index = i;
-
-                    area = Cv2.ContourArea(contours[i].ToArray());
-                }
-            }
-
-            return index;
         }
     }
 }
